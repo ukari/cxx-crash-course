@@ -28,13 +28,13 @@ int main() {
   char letter_D = upper_ptr[3]; // letter_D equals 'D'
   printf("lower: %s\nupper: %s\n", lower, upper);
   char readc;
-  if (read_from(lower, sizeof(lower) / sizeof(char), 5, &readc)) {
+  if (read_from(lower, sizeof(lower) / sizeof(lower[0]), 5, &readc)) {
     printf("read lower char: %c\n", readc);
   } else {
     printf("out of range\n");
   }
 
-  if (write_to(upper, sizeof(upper) / sizeof(char), 4, 'g')) {
+  if (write_to(upper, sizeof(upper) / sizeof(upper[0]), 4, 'g')) {
     printf("upper: %s\n", upper);
   } else {
     printf("out of range\n");
