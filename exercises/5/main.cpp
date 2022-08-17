@@ -28,8 +28,8 @@ struct FileLogger : Logger {
 };
 
 struct AccountDatabase {
-  virtual void retrieve(long id) = 0;
-  virtual void setAmount(long id, long amounts) = 0;
+  virtual double retrieve(long id) = 0;
+  virtual void setAmount(long id, double amounts) = 0;
   virtual ~AccountDatabase() = default;
 };
 
@@ -42,6 +42,9 @@ struct Bank {
     logger = new_logger;
   }
   void make_transfer(long from, long to, double amount) {
+    accountDatabase->setAmount(from, accountDatabase->retrieve(from) - amount);
+    accountDatabase->setAmount(to, accountDatabase->retrieve(to) + amount);
+    
     if (logger) {
       logger->log_transfer(from, to, amount);
     }
@@ -57,14 +60,15 @@ struct InMemoryAccountDatabase : AccountDatabase {
 
   }
 
-  void retrieve(long id) override {
+  double retrieve(long id) override {
     std::cout << "account " << id << ": " << database[id] << std::endl;
+    return database[id];
   }
 
-  void setAmount(long id, long amounts) override {
+  void setAmount(long id, double amounts) override {
     database[id] = amounts;
   }
-  std::unordered_map<long, long> database;
+  std::unordered_map<long, double> database;
 };
 
 int main() {
@@ -73,7 +77,11 @@ int main() {
   db.retrieve(1001);
   Bank bank {&db};
   ConsoleLogger logger {"console logger"};
+  db.setAmount(1000, 10000);
+  db.setAmount(2000, 5000);
   bank.set_logger(&logger);
-  bank.make_transfer(1000,2000,4000);
+  bank.make_transfer(1000, 2000, 4000);
+  db.retrieve(1000);
+  db.retrieve(2000);
   return 0;
 }
